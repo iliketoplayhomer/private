@@ -1,0 +1,67 @@
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- [[ SETTINGS ]]
+local ACCENT_COLOR = Color3.fromRGB(80, 140, 200) -- Unnamed Blue
+local GLOW_COLOR = Color3.fromRGB(100, 180, 255)
+local SPIN_SPEED = 450
+local PULSE_SPEED = 12
+
+-- [[ GUI SETUP ]]
+local CrosshairGui = Instance.new("ScreenGui")
+CrosshairGui.Name = "Kalex_Glow_Crosshair"
+CrosshairGui.ResetOnSpawn = false
+CrosshairGui.DisplayOrder = 10000
+CrosshairGui.IgnoreGuiInset = true
+CrosshairGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Center = Instance.new("Frame", CrosshairGui)
+Center.Size = UDim2.new(0, 0, 0, 0)
+Center.Position = UDim2.new(0.5, 0, 0.5, 0)
+Center.BackgroundTransparency = 1
+
+-- Function to create glowing lines
+local function CreateLine(parent, isVertical)
+    local line = Instance.new("Frame", parent)
+    line.AnchorPoint = Vector2.new(0.5, 0.5)
+    line.BackgroundColor3 = ACCENT_COLOR
+    line.BorderSizePixel = 0
+    line.ZIndex = 2
+    
+    -- Glow Layer
+    local glow = Instance.new("Frame", line)
+    glow.Size = UDim2.new(1, 4, 1, 4)
+    glow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    glow.AnchorPoint = Vector2.new(0.5, 0.5)
+    glow.BackgroundColor3 = GLOW_COLOR
+    glow.BackgroundTransparency = 0.6
+    glow.BorderSizePixel = 0
+    glow.ZIndex = 1
+    
+    return line
+end
+
+local HLine = CreateLine(Center, false)
+local VLine = CreateLine(Center, true)
+
+-- [[ ANIMATION ENGINE ]]
+RunService.RenderStepped:Connect(function()
+    -- Calculate Rotation
+    local rot = (tick() * SPIN_SPEED) % 360
+    
+    -- Calculate Resizing (Pulse)
+    -- Base size 24, pulses up to 36
+    local size = 24 + math.sin(tick() * PULSE_SPEED) * 12 
+    
+    -- Apply to Horizontal
+    HLine.Rotation = rot
+    HLine.Size = UDim2.new(0, size, 0, 2)
+    
+    -- Apply to Vertical
+    VLine.Rotation = rot
+    VLine.Size = UDim2.new(0, 2, 0, size)
+end)
+
+-- Notify
+print("[KALEX] Glowing Crosshair Loaded")
